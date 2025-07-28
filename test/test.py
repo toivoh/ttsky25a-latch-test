@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: © 2024 Tiny Tapeout
+# SPDX-FileCopyrightText: © 2025 Toivo Henningsson
 # SPDX-License-Identifier: Apache-2.0
 
 import cocotb
@@ -8,33 +8,57 @@ from cocotb.triggers import ClockCycles
 
 @cocotb.test()
 async def test_project(dut):
-    dut._log.info("Start")
+	clock = Clock(dut.clk, 10, units="us")
+	cocotb.start_soon(clock.start())
 
-    # Set the clock period to 10 us (100 KHz)
-    clock = Clock(dut.clk, 10, units="us")
-    cocotb.start_soon(clock.start())
+	dut.rst_n.value = 0
+	dut.ui_in.value = 7
+	await ClockCycles(dut.clk, 10)
+	dut.rst_n.value = 1
+	dut.ui_in.value = 0
 
-    # Reset
-    dut._log.info("Reset")
-    dut.ena.value = 1
-    dut.ui_in.value = 0
-    dut.uio_in.value = 0
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
-    dut.rst_n.value = 1
+	if False:
+		for i in range(4):
+			wdata = i & 1
+			for j in range(5):
+				we = 3 if j == 2 else 0
+				ui_in = wdata | (we << 1)
+				dut.ui_in.value = ui_in
+				await ClockCycles(dut.clk, 1)
 
-    dut._log.info("Test project behavior")
+				data_out = dut.uo_out.value.integer
+				print("ui_in = ", ui_in, ", data_out = ", data_out, sep="")
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+	if True:
+		# Try writing to the the first latch on even clock cycles and the second latch on odd clock cycles,
+		# check that they get the values that are expected.
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+		wait_cycles = 2
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
+		lfsr = 1 # use a 7-bit LFSR to generate some test patterns
 
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
+		data_head = 3 # The most recently written data values
+		data_pipe = -1 & ((1 << (2*wait_cycles)) - 1) # Delay pipe of previous data values
+
+		for i in range(128+10):
+			we = (i&1) + 1
+			wdata = lfsr & 1
+			print("we = ", we, ", wdata = ", wdata, sep="", end="\t")
+
+			# Apply write to data_head
+			data_head = (data_head & ~we) | (we & (wdata*3))
+
+			# Apply write to the design
+			ui_in = wdata | (we << 1)
+			dut.ui_in.value = ui_in
+			await ClockCycles(dut.clk, 1)
+
+			# Read out and compare with expected data values
+			data_out = dut.uo_out.value.integer
+			data_expected = data_pipe & 3
+			print("out = ", data_out, ", expected = ", data_expected, sep="")
+			assert data_out == data_expected
+
+			# Update LFSR and delay line
+			lfsr = ((lfsr << 1) & 127) | (((lfsr&1)!=0)^((lfsr&64)!=0))
+			data_pipe = (data_pipe >> 2) | (data_head << (2*(wait_cycles - 1)))
