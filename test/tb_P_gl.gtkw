@@ -1,0 +1,55 @@
+[*]
+[*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
+[*] Fri Aug 29 04:39:43 2025
+[*]
+[dumpfile] "/home/toivo/code/tinytapeout/ttsky25a-latch-test/test/tb.vcd"
+[dumpfile_mtime] "Fri Aug 29 04:39:01 2025"
+[dumpfile_size] 294849
+[savefile] "/home/toivo/code/tinytapeout/ttsky25a-latch-test/test/tb_P_gl.gtkw"
+[timestart] 0
+[size] 2280 600
+[pos] -1 -1
+*-25.000000 172300000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] tb.
+[treeopen] tb.user_project.
+[sst_width] 297
+[signals_width] 118
+[sst_expanded] 1
+[sst_vpaned_height] 158
+@28
+tb.rst_n
+tb.clk
+@200
+-
+-wdata
+@28
+tb.user_project.\in[0]
+@200
+-
+-we[1:0]
+@28
+tb.user_project.\in[2]
+tb.user_project.\in[1]
+@200
+-
+@29
+tb.user_project.\gclk[1]
+@28
+tb.user_project.\gclk[0]
+@200
+-
+@800022
+tb.user_project.uo_out[7:0]
+@28
+(0)tb.user_project.uo_out[7:0]
+(1)tb.user_project.uo_out[7:0]
+(2)tb.user_project.uo_out[7:0]
+(3)tb.user_project.uo_out[7:0]
+(4)tb.user_project.uo_out[7:0]
+(5)tb.user_project.uo_out[7:0]
+(6)tb.user_project.uo_out[7:0]
+(7)tb.user_project.uo_out[7:0]
+@1001200
+-group_end
+[pattern_trace] 1
+[pattern_trace] 0

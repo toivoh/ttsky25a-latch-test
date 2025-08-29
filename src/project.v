@@ -5,6 +5,9 @@
 
 `default_nettype none
 
+`define USE_P_ONLY
+
+
 // Two bits of memory stored in P-latches, with shared N-latch for writing
 module tt_um_example (
 		input  wire [7:0] ui_in,    // Dedicated inputs
@@ -28,15 +31,25 @@ module tt_um_example (
 
 
 `ifdef PURE_RTL
+	wire wdata_eff;
+`ifdef USE_P_ONLY
+	assign wdata_eff = ui_in[0]; // look at the next wdata bit instead since we have one cycle less delay
+`else
+	assign wdata_eff = wdata;
+`endif
 	reg [1:0] data;
 	always @(posedge clk) begin
-		if (we[0]) data[0] <= wdata;
-		if (we[1]) data[1] <= wdata;
+		if (we[0]) data[0] <= wdata_eff;
+		if (we[1]) data[1] <= wdata_eff;
 	end
+`else
+`ifdef USE_P_ONLY
+	wire wdata2 = wdata;
 `else
 	// Shared negative edge triggered latch
 	wire wdata2;
 	sky130_fd_sc_hd__dlxtn_1 n_latch( .GATE_N(clk), .D(wdata), .Q(wdata2));
+`endif
 
 	// Clock gates
 	wire [1:0] gclk;

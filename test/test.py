@@ -29,11 +29,13 @@ async def test_project(dut):
 				data_out = dut.uo_out.value.integer
 				print("ui_in = ", ui_in, ", data_out = ", data_out, sep="")
 
+	p_only = True
+
 	if True:
 		# Try writing to the the first latch on even clock cycles and the second latch on odd clock cycles,
 		# check that they get the values that are expected.
 
-		wait_cycles = 2
+		wait_cycles = 1 if p_only else 2
 
 		lfsr = 1 # use a 7-bit LFSR to generate some test patterns
 
@@ -46,7 +48,8 @@ async def test_project(dut):
 			print("we = ", we, ", wdata = ", wdata, sep="", end="\t")
 
 			# Apply write to data_head
-			data_head = (data_head & ~we) | (we & (wdata*3))
+			we_eff = we ^ 3 if p_only else we
+			data_head = (data_head & ~we_eff) | (we_eff & (wdata*3))
 
 			# Apply write to the design
 			ui_in = wdata | (we << 1)
