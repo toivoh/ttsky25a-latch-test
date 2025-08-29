@@ -29,6 +29,7 @@ async def test_project(dut):
 				data_out = dut.uo_out.value.integer
 				print("ui_in = ", ui_in, ", data_out = ", data_out, sep="")
 
+	# Use alternate version with P latches only? Otherwise use N latch -> P latch. Use together with `define USE_P_ONLY in project.v.
 	p_only = True
 
 	if True:

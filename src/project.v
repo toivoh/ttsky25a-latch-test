@@ -5,6 +5,7 @@
 
 `default_nettype none
 
+// Use alternate version with P latches only? Otherwise use N latch -> P latch
 `define USE_P_ONLY
 
 
